@@ -1,0 +1,734 @@
+From f1aaf154138efa0035c51b069568e413e5735e36 Mon Sep 17 00:00:00 2001
+From: PowerShell Team Bot <69177312+pwshBot@users.noreply.github.com>
+Date: Fri, 22 May 2026 20:28:08 -0400
+Subject: [PATCH] Update branch to use the .NET 11 SDK 11.0.100-preview.4
+ (#27504)
+
+---
+ CHANGELOG/v7.7/dependencychanges.json         | 13 +++
+ DotnetRuntimeMetadata.json                    |  2 +-
+ global.json                                   |  2 +-
+ ...oft.PowerShell.Commands.Diagnostics.csproj |  2 +-
+ ...soft.PowerShell.Commands.Management.csproj |  2 +-
+ .../commands/management/CIMHelper.cs          | 11 +--
+ .../management/GetComputerInfoCommand.cs      |  2 -
+ ...crosoft.PowerShell.Commands.Utility.csproj |  4 +-
+ ...crosoft.PowerShell.CoreCLR.Eventing.csproj |  2 +-
+ .../Microsoft.PowerShell.SDK.csproj           | 10 +-
+ .../Microsoft.WSMan.Management.csproj         |  2 +-
+ .../System.Management.Automation.csproj       | 12 +--
+ test/tools/TestService/TestService.csproj     |  2 +-
+ test/tools/WebListener/WebListener.csproj     |  2 +-
+ test/xUnit/xUnit.tests.csproj                 |  2 +-
+ tools/cgmanifest/main/cgmanifest.json         | 98 +++++++++----------
+ 16 files changed, 86 insertions(+), 82 deletions(-)
+
+diff --git a/CHANGELOG/v7.7/dependencychanges.json b/CHANGELOG/v7.7/dependencychanges.json
+index 21cd1577251..ccaabfce2c1 100644
+--- a/CHANGELOG/v7.7/dependencychanges.json
++++ b/CHANGELOG/v7.7/dependencychanges.json
+@@ -11,5 +11,18 @@
+     "AdvisoryUrls": [],
+     "Justification": "Updated .NET SDK. Building with the latest SDK is required.",
+     "TimestampUtc": "2026-04-17T17:16:15.7099916Z"
++  },
++  {
++    "ChangeType": "NonSecurity",
++    "Branch": "master",
++    "PackageId": ".NET SDK",
++    "FromVersion": "11.0.100-preview.3.26207.106",
++    "ToVersion": "11.0.100-preview.4.26230.115",
++    "VulnerabilityId": [],
++    "Severity": [],
++    "VulnerableRanges": [],
++    "AdvisoryUrls": [],
++    "Justification": "Updated .NET SDK. Building with the latest SDK is required.",
++    "TimestampUtc": "2026-05-22T18:15:20.6826051Z"
+   }
+ ]
+diff --git a/DotnetRuntimeMetadata.json b/DotnetRuntimeMetadata.json
+index f8288b53b67..d06d4aaeaa5 100644
+--- a/DotnetRuntimeMetadata.json
++++ b/DotnetRuntimeMetadata.json
+@@ -4,7 +4,7 @@
+     "quality": "daily",
+     "qualityFallback": "preview",
+     "packageVersionPattern": "9.0.0-preview.6",
+-    "sdkImageVersion": "11.0.100-preview.3.26207.106",
++    "sdkImageVersion": "11.0.100-preview.4.26230.115",
+     "nextChannel": "9.0.0-preview.7",
+     "azureFeed": "",
+     "sdkImageOverride": ""
+diff --git a/global.json b/global.json
+index d31f5220d83..92499a1ba9c 100644
+--- a/global.json
++++ b/global.json
+@@ -1,5 +1,5 @@
+ {
+   "sdk": {
+-    "version": "11.0.100-preview.3.26207.106"
++    "version": "11.0.100-preview.4.26230.115"
+   }
+ }
+diff --git a/src/Microsoft.PowerShell.Commands.Diagnostics/Microsoft.PowerShell.Commands.Diagnostics.csproj b/src/Microsoft.PowerShell.Commands.Diagnostics/Microsoft.PowerShell.Commands.Diagnostics.csproj
+index 9552f72c83a..47acaaf4651 100644
+--- a/src/Microsoft.PowerShell.Commands.Diagnostics/Microsoft.PowerShell.Commands.Diagnostics.csproj
++++ b/src/Microsoft.PowerShell.Commands.Diagnostics/Microsoft.PowerShell.Commands.Diagnostics.csproj
+@@ -8,7 +8,7 @@
+
+   <ItemGroup>
+     <ProjectReference Include="..\System.Management.Automation\System.Management.Automation.csproj" />
+-    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="11.0.0-preview.3.26207.106" />
++    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="11.0.0-preview.4.26230.115" />
+   </ItemGroup>
+
+   <PropertyGroup>
+diff --git a/src/Microsoft.PowerShell.Commands.Management/Microsoft.PowerShell.Commands.Management.csproj b/src/Microsoft.PowerShell.Commands.Management/Microsoft.PowerShell.Commands.Management.csproj
+index 8ce2a97d67b..3ca7ee64edc 100644
+--- a/src/Microsoft.PowerShell.Commands.Management/Microsoft.PowerShell.Commands.Management.csproj
++++ b/src/Microsoft.PowerShell.Commands.Management/Microsoft.PowerShell.Commands.Management.csproj
+@@ -47,7 +47,7 @@
+
+   <ItemGroup>
+     <!-- the following package(s) are from https://github.com/dotnet/corefx -->
+-    <PackageReference Include="System.ServiceProcess.ServiceController" Version="11.0.0-preview.3.26207.106" />
++    <PackageReference Include="System.ServiceProcess.ServiceController" Version="11.0.0-preview.4.26230.115" />
+   </ItemGroup>
+
+ </Project>
+diff --git a/src/Microsoft.PowerShell.Commands.Management/commands/management/CIMHelper.cs b/src/Microsoft.PowerShell.Commands.Management/commands/management/CIMHelper.cs
+index 688b6362e16..3f3f617097a 100644
+--- a/src/Microsoft.PowerShell.Commands.Management/commands/management/CIMHelper.cs
++++ b/src/Microsoft.PowerShell.Commands.Management/commands/management/CIMHelper.cs
+@@ -9,8 +9,6 @@
+
+ namespace Microsoft.PowerShell.Commands
+ {
+-    using Extensions;
+-
+     internal static class CIMHelper
+     {
+         internal static class ClassNames
+@@ -237,11 +235,6 @@ internal static string EscapePath(string path)
+             return string.Join(@"\\", path.Split('\\'));
+         }
+     }
+-}
+-
+-namespace Extensions
+-{
+-    using Microsoft.PowerShell.Commands;
+
+     internal static class CIMExtensions
+     {
+@@ -317,12 +310,12 @@ internal static CimInstance QueryFirstInstance(this CimSession session, string q
+
+         internal static T[] GetAll<T>(this CimSession session, string wmiClassName) where T : class, new()
+         {
+-            return Microsoft.PowerShell.Commands.CIMHelper.GetAll<T>(session, wmiClassName);
++            return CIMHelper.GetAll<T>(session, wmiClassName);
+         }
+
+         internal static T[] GetAll<T>(this CimSession session, string wmiNamespace, string wmiClassName) where T : class, new()
+         {
+-            return Microsoft.PowerShell.Commands.CIMHelper.GetAll<T>(session, wmiNamespace, wmiClassName);
++            return CIMHelper.GetAll<T>(session, wmiNamespace, wmiClassName);
+         }
+     }
+ }
+diff --git a/src/Microsoft.PowerShell.Commands.Management/commands/management/GetComputerInfoCommand.cs b/src/Microsoft.PowerShell.Commands.Management/commands/management/GetComputerInfoCommand.cs
+index 87f96c436ea..65d57194f5d 100644
+--- a/src/Microsoft.PowerShell.Commands.Management/commands/management/GetComputerInfoCommand.cs
++++ b/src/Microsoft.PowerShell.Commands.Management/commands/management/GetComputerInfoCommand.cs
+@@ -17,8 +17,6 @@
+
+ namespace Microsoft.PowerShell.Commands
+ {
+-    using Extensions;
+-
+     #region GetComputerInfoCommand cmdlet implementation
+     /// <summary>
+     /// The Get-ComputerInfo cmdlet gathers and reports information
+diff --git a/src/Microsoft.PowerShell.Commands.Utility/Microsoft.PowerShell.Commands.Utility.csproj b/src/Microsoft.PowerShell.Commands.Utility/Microsoft.PowerShell.Commands.Utility.csproj
+index cc98893c5b6..39436279172 100644
+--- a/src/Microsoft.PowerShell.Commands.Utility/Microsoft.PowerShell.Commands.Utility.csproj
++++ b/src/Microsoft.PowerShell.Commands.Utility/Microsoft.PowerShell.Commands.Utility.csproj
+@@ -8,7 +8,7 @@
+
+   <ItemGroup>
+     <ProjectReference Include="..\System.Management.Automation\System.Management.Automation.csproj" />
+-    <PackageReference Include="Markdig.Signed" Version="1.1.2" />
++    <PackageReference Include="Markdig.Signed" Version="1.2.0" />
+     <PackageReference Include="Microsoft.PowerShell.MarkdownRender" Version="7.2.1" />
+   </ItemGroup>
+
+@@ -33,7 +33,7 @@
+
+   <ItemGroup>
+     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0" />
+-    <PackageReference Include="System.Drawing.Common" Version="11.0.0-preview.3.26207.106" />
++    <PackageReference Include="System.Drawing.Common" Version="11.0.0-preview.4.26230.115" />
+     <PackageReference Include="JsonSchema.Net" Version="7.4.0" />
+   </ItemGroup>
+
+diff --git a/src/Microsoft.PowerShell.CoreCLR.Eventing/Microsoft.PowerShell.CoreCLR.Eventing.csproj b/src/Microsoft.PowerShell.CoreCLR.Eventing/Microsoft.PowerShell.CoreCLR.Eventing.csproj
+index dadff652e53..b10249b9351 100644
+--- a/src/Microsoft.PowerShell.CoreCLR.Eventing/Microsoft.PowerShell.CoreCLR.Eventing.csproj
++++ b/src/Microsoft.PowerShell.CoreCLR.Eventing/Microsoft.PowerShell.CoreCLR.Eventing.csproj
+@@ -8,7 +8,7 @@
+
+   <ItemGroup>
+     <!-- the following package(s) are from https://github.com/dotnet/corefx -->
+-    <PackageReference Include="System.Diagnostics.EventLog" Version="11.0.0-preview.3.26207.106" />
++    <PackageReference Include="System.Diagnostics.EventLog" Version="11.0.0-preview.4.26230.115" />
+   </ItemGroup>
+
+ </Project>
+diff --git a/src/Microsoft.PowerShell.SDK/Microsoft.PowerShell.SDK.csproj b/src/Microsoft.PowerShell.SDK/Microsoft.PowerShell.SDK.csproj
+index 50d431225c7..90141f51a6b 100644
+--- a/src/Microsoft.PowerShell.SDK/Microsoft.PowerShell.SDK.csproj
++++ b/src/Microsoft.PowerShell.SDK/Microsoft.PowerShell.SDK.csproj
+@@ -16,19 +16,19 @@
+
+   <ItemGroup>
+     <!-- This section is to force the version of non-direct dependencies -->
+-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="11.0.0-preview.3.26207.106" />
+-    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="11.0.0-preview.3.26207.106" />
++    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="11.0.0-preview.4.26230.115" />
++    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="11.0.0-preview.4.26230.115" />
+     <!-- the following package(s) are from https://github.com/dotnet/fxdac -->
+     <PackageReference Include="System.Data.SqlClient" Version="4.9.1" />
+     <!-- the following package(s) are from https://github.com/dotnet/corefx -->
+-    <PackageReference Include="System.IO.Packaging" Version="11.0.0-preview.3.26207.106" />
+-    <PackageReference Include="System.Net.Http.WinHttpHandler" Version="11.0.0-preview.3.26207.106" />
++    <PackageReference Include="System.IO.Packaging" Version="11.0.0-preview.4.26230.115" />
++    <PackageReference Include="System.Net.Http.WinHttpHandler" Version="11.0.0-preview.4.26230.115" />
+     <!-- the following package(s) are from https://github.com/dotnet/wcf -->
+     <PackageReference Include="System.ServiceModel.Http" Version="10.0.652802" />
+     <PackageReference Include="System.ServiceModel.NetTcp" Version="10.0.652802" />
+     <PackageReference Include="System.ServiceModel.Primitives" Version="10.0.652802" />
+     <!-- the source could not be found for the following package(s) -->
+-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="11.0.0-preview.3.26207.106" />
++    <PackageReference Include="Microsoft.Windows.Compatibility" Version="11.0.0-preview.4.26230.115" />
+   </ItemGroup>
+
+   <!--
+diff --git a/src/Microsoft.WSMan.Management/Microsoft.WSMan.Management.csproj b/src/Microsoft.WSMan.Management/Microsoft.WSMan.Management.csproj
+index d7b6d1235da..1aaa79a6727 100644
+--- a/src/Microsoft.WSMan.Management/Microsoft.WSMan.Management.csproj
++++ b/src/Microsoft.WSMan.Management/Microsoft.WSMan.Management.csproj
+@@ -10,7 +10,7 @@
+     <ProjectReference Include="..\System.Management.Automation\System.Management.Automation.csproj" />
+     <ProjectReference Include="..\Microsoft.WSMan.Runtime\Microsoft.WSMan.Runtime.csproj" />
+     <!-- the following package(s) are from https://github.com/dotnet/corefx -->
+-    <PackageReference Include="System.ServiceProcess.ServiceController" Version="11.0.0-preview.3.26207.106" />
++    <PackageReference Include="System.ServiceProcess.ServiceController" Version="11.0.0-preview.4.26230.115" />
+   </ItemGroup>
+
+   <PropertyGroup>
+diff --git a/src/System.Management.Automation/System.Management.Automation.csproj b/src/System.Management.Automation/System.Management.Automation.csproj
+index f3e1d0dd9e8..d7e96f5bd7f 100644
+--- a/src/System.Management.Automation/System.Management.Automation.csproj
++++ b/src/System.Management.Automation/System.Management.Automation.csproj
+@@ -32,12 +32,12 @@
+     <!-- the Application Insights package -->
+     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.23.0" />
+     <!-- the following package(s) are from https://github.com/dotnet/corefx -->
+-    <PackageReference Include="Microsoft.Win32.Registry.AccessControl" Version="11.0.0-preview.3.26207.106" />
+-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="11.0.0-preview.3.26207.106" />
+-    <PackageReference Include="System.DirectoryServices" Version="11.0.0-preview.3.26207.106" />
+-    <PackageReference Include="System.Management" Version="11.0.0-preview.3.26207.106" />
+-    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="11.0.0-preview.3.26207.106" />
+-    <PackageReference Include="System.Security.Permissions" Version="11.0.0-preview.3.26207.106" />
++    <PackageReference Include="Microsoft.Win32.Registry.AccessControl" Version="11.0.0-preview.4.26230.115" />
++    <PackageReference Include="System.Configuration.ConfigurationManager" Version="11.0.0-preview.4.26230.115" />
++    <PackageReference Include="System.DirectoryServices" Version="11.0.0-preview.4.26230.115" />
++    <PackageReference Include="System.Management" Version="11.0.0-preview.4.26230.115" />
++    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="11.0.0-preview.4.26230.115" />
++    <PackageReference Include="System.Security.Permissions" Version="11.0.0-preview.4.26230.115" />
+     <!-- the following package(s) are from the powershell org -->
+     <PackageReference Include="Microsoft.Management.Infrastructure" Version="3.0.0" />
+     <PackageReference Include="Microsoft.PowerShell.Native" Version="700.0.0-rc.1" />
+diff --git a/test/tools/TestService/TestService.csproj b/test/tools/TestService/TestService.csproj
+index 37b73426f6c..3cf42bd6e28 100644
+--- a/test/tools/TestService/TestService.csproj
++++ b/test/tools/TestService/TestService.csproj
+@@ -15,7 +15,7 @@
+   </PropertyGroup>
+
+   <ItemGroup>
+-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="11.0.0-preview.3.26207.106" />
++    <PackageReference Include="Microsoft.Windows.Compatibility" Version="11.0.0-preview.4.26230.115" />
+     <PackageReference Include="System.Data.SqlClient" Version="4.9.1" />
+   </ItemGroup>
+
+diff --git a/test/tools/WebListener/WebListener.csproj b/test/tools/WebListener/WebListener.csproj
+index 3567cd93c68..50c28eb9acd 100644
+--- a/test/tools/WebListener/WebListener.csproj
++++ b/test/tools/WebListener/WebListener.csproj
+@@ -7,6 +7,6 @@
+   </PropertyGroup>
+
+   <ItemGroup>
+-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="11.0.0-preview.3.26207.106" />
++    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="11.0.0-preview.4.26230.115" />
+   </ItemGroup>
+ </Project>
+diff --git a/test/xUnit/xUnit.tests.csproj b/test/xUnit/xUnit.tests.csproj
+index a2a9fe041e9..b01f3434e69 100644
+--- a/test/xUnit/xUnit.tests.csproj
++++ b/test/xUnit/xUnit.tests.csproj
+@@ -30,7 +30,7 @@
+       <PrivateAssets>all</PrivateAssets>
+     </PackageReference>
+     <PackageReference Include="XunitXml.TestLogger" Version="8.0.0" />
+-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.4.0" />
++    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
+   </ItemGroup>
+
+   <ItemGroup>
+diff --git a/tools/cgmanifest/main/cgmanifest.json b/tools/cgmanifest/main/cgmanifest.json
+index 5d2de074cae..97e323ed123 100644
+--- a/tools/cgmanifest/main/cgmanifest.json
++++ b/tools/cgmanifest/main/cgmanifest.json
+@@ -65,7 +65,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "Markdig.Signed",
+-          "Version": "1.1.2"
++          "Version": "1.2.0"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -85,7 +85,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "Microsoft.Bcl.AsyncInterfaces",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -125,7 +125,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "Microsoft.Extensions.ObjectPool",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -165,7 +165,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "Microsoft.Win32.Registry.AccessControl",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -175,7 +175,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "Microsoft.Win32.SystemEvents",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -185,7 +185,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "Microsoft.Windows.Compatibility",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -205,7 +205,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "runtime.android-arm.runtime.native.System.IO.Ports",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -215,7 +215,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "runtime.android-arm64.runtime.native.System.IO.Ports",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -225,7 +225,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "runtime.android-x64.runtime.native.System.IO.Ports",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -235,7 +235,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "runtime.android-x86.runtime.native.System.IO.Ports",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -245,7 +245,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "runtime.linux-arm.runtime.native.System.IO.Ports",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -255,7 +255,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "runtime.linux-arm64.runtime.native.System.IO.Ports",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -265,7 +265,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "runtime.linux-bionic-arm64.runtime.native.System.IO.Ports",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -275,7 +275,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "runtime.linux-bionic-x64.runtime.native.System.IO.Ports",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -285,7 +285,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "runtime.linux-musl-arm.runtime.native.System.IO.Ports",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -295,7 +295,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "runtime.linux-musl-arm64.runtime.native.System.IO.Ports",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -305,7 +305,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "runtime.linux-musl-x64.runtime.native.System.IO.Ports",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -315,7 +315,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "runtime.linux-x64.runtime.native.System.IO.Ports",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -325,7 +325,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "runtime.maccatalyst-arm64.runtime.native.System.IO.Ports",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -335,7 +335,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "runtime.maccatalyst-x64.runtime.native.System.IO.Ports",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -355,7 +355,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "runtime.native.System.IO.Ports",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -365,7 +365,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "runtime.osx-arm64.runtime.native.System.IO.Ports",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -375,7 +375,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "runtime.osx-x64.runtime.native.System.IO.Ports",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -435,7 +435,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.CodeDom",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -445,7 +445,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.ComponentModel.Composition.Registration",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -455,7 +455,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.ComponentModel.Composition",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -465,7 +465,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.Configuration.ConfigurationManager",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -475,7 +475,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.Data.Odbc",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -485,7 +485,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.Data.OleDb",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -505,7 +505,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.Diagnostics.EventLog",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -515,7 +515,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.Diagnostics.PerformanceCounter",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -525,7 +525,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.DirectoryServices.AccountManagement",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -535,7 +535,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.DirectoryServices.Protocols",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -545,7 +545,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.DirectoryServices",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -555,7 +555,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.Drawing.Common",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -565,7 +565,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.IO.Packaging",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -575,7 +575,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.IO.Ports",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -585,7 +585,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.Management",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -595,7 +595,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.Net.Http.WinHttpHandler",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -605,7 +605,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.Reflection.Context",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -615,7 +615,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.Runtime.Caching",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -625,7 +625,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.Security.Cryptography.Pkcs",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -635,7 +635,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.Security.Cryptography.ProtectedData",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -645,7 +645,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.Security.Cryptography.Xml",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -655,7 +655,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.Security.Permissions",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -705,7 +705,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.ServiceModel.Syndication",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -715,7 +715,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.ServiceProcess.ServiceController",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -725,7 +725,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.Speech",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
+@@ -745,7 +745,7 @@
+         "Type": "nuget",
+         "Nuget": {
+           "Name": "System.Windows.Extensions",
+-          "Version": "10.0.6"
++          "Version": "10.0.8"
+         }
+       },
+       "DevelopmentDependency": false
